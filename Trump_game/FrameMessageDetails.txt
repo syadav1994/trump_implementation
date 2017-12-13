@@ -1,0 +1,266 @@
+/******************************************************************/
+This file includes details about all the different message transfers
+between server and client. Each message frame has its frame type,
+length, data type, receiver/sender ID and message. ALl the messages
+are mentioned below.
+/******************************************************************/
+
+
+/******************************************************************/
+Message 1 : Sending acknowledgement
+From: Server
+To: Client
+Description: Sending acknowledgement when physical connection is
+			 established. Player ID and team name will be sent in
+			 the message.
+Frame type: ACKJOINREQ
+Data type: CHARACTER
+Message length: 2
+Message: 'Player ID','Team'
+Special Requirements: Only two characters. Player ID can only have
+					  value 1,2,3,4 (in ASCII). Value 1 means player
+					  1, 2 means player 2 and so on. Team can only
+					  have value 0,1 (in ASCII). Value 0 means team A
+					  and 1 means team B.
+/******************************************************************/
+
+
+/******************************************************************/
+Message 2 : Client sending player info, for e.g. name
+From: Client
+To: Server
+Description: Sending name of the player 
+Frame type: JOINREQUEST
+Data type: CHARACTER
+Message length: Variable
+Message: 'S','H','U','B','H','A','M','\0'
+Special Requirements: Length of the name can be variable. Name should
+					  always be appendend by a null character ('\0')
+/******************************************************************/
+
+
+/******************************************************************/
+Message 3 : Sending initial 5 cards to client
+From: Server
+To: Client
+Description: Sending 5 cards to client for setting trump 
+Frame type: FIRST5CARDS
+Data type: CHARACTER
+Message length: 52
+Message: '0','0','2','T','1','1','4','F'......
+Special Requirements: 52 charcters are divided into 13 segments of
+					  size 4 each. In these 4 charcters, first
+					  character represents suit by casting enum,
+					  second and third character represents card
+					  number and last character represents validity
+					  of card.
+/******************************************************************/
+
+
+/******************************************************************/
+Message 4 : Requesting random player to set the trump
+From: Server
+To: Random client
+Description: Setting trump by asking randomly selected client 
+Frame type: SETTRUMP
+Data type: CHARACTER
+Message length: 0
+Message: 
+Special Requirements: Message buffer will be empty and message
+					  length will be 0 
+/******************************************************************/
+
+
+/******************************************************************/
+Message 5 : Client sending trump to server
+From: Client
+To: Server
+Description: Client will send trump suit to the server  
+Frame type: TRUMPIS
+Data type: CHARACTER
+Message length: 1
+Message: '0' or '1' or ..
+Special Requirements: Only single character representing suit enum
+					  casted to int then converted to ASCII.
+/******************************************************************/
+
+
+/******************************************************************/
+Message 6 : Broadcasting trump to all the players 
+From: Server
+To: All clients
+Description: Sending trump to all the joined clients
+Frame type: BROADCASTTRUMP
+Data type: CHARACTER
+Message length: 1
+Message: '0' or '1' or ..
+Special Requirements: Only single character representing suit enum
+					  casted to int then converted to ASCII.
+/******************************************************************/
+
+
+/******************************************************************/
+Message 7 : Sending remaining cards 
+From: Server
+To: All clients
+Description: Sending remaining cards to continue game play 
+Frame type: REMAININGCARDS
+Data type: CHARACTER
+Message length: 0
+Message: 
+Special Requirements: No message will be sent. Cards are already
+					  distributed to players with validity set to 
+					  false.
+/******************************************************************/
+
+
+/******************************************************************/
+Message 8 : Asking player to play a move
+From: Server
+To: Client
+Description: Player is asked to play a card  
+Frame type: TURNTOPLAY
+Data type: CHARACTER
+Message length: 0
+Message: 
+Special Requirements: Message length should be 0 and buffer should
+					  be null 
+/******************************************************************/
+
+
+/******************************************************************/
+Message 9 : Move played by player 
+From: Client
+To: Server
+Description: Player will now send a card played by him/her  
+Frame type: CARDPLAYED
+Data type: CHARACTER
+Message length: 3
+Message: '0','0','9'
+Special Requirements: Length of message should be 3. First character
+					  should be suit enum casted to int then to ASCII.
+					  Second and third character should be the card
+					  number in ASCII. 
+/******************************************************************/
+
+
+/******************************************************************/
+Message 10 : Broadcasting moves to other players 
+From: Server
+To: All clients
+Description: After a player has played, other players should know
+		  	 the move
+Frame type: BROADCASTMOVE
+Data type: CHARACTER
+Message length: 4
+Message: '1','0','0','9'
+Special Requirements: Message length should be of 4 characters. First
+					  character denotes the player ID in casted enum
+					  into int then to ASCII. Second character denotes
+					  suit of the card in enum casted to int then to
+					  ASCII. Last two character denotes the card number
+					  in ASCII. 
+/******************************************************************/
+
+
+/******************************************************************/
+Message 11 : Broadcasting players info before start of game
+From: Server
+To: All clients
+Description: All players should know the name of all other players
+Frame type: BROADCASTPLAYERSINFO
+Data type: CHARACTER
+Message length: Variable
+Message: "Name" , '\0' , "Name" , '\0'..
+Special Requirements: It is assumed that the first name is of player1
+					  and second name is of player 2 and so on. After
+					  every name, there must be a null character '\0'.
+					  Null character will help in picking out names.
+/******************************************************************/
+
+
+/******************************************************************/
+Message 12 : Broadcasting round result 
+From: Server
+To: All clients
+Description: After every round, result will be broadcasted to all
+			 players
+Frame type: BROADCASTRESULT
+Data type: CHARACTER
+Message length: 4
+Message: '4','0','1','7'
+Special Requirements: Buffer length will be of 4. First character
+					  represents round number in ASCII. Second char
+					  represents last player won of enum ENTITY type
+					  casted to int then to ASCII. Third character
+					  represents score of team A in ASCII. Fourth
+					  character represents score of team B in ASCII. 
+/******************************************************************/
+
+
+/******************************************************************/
+Message 13 : Socket is disconnected or game intentionally left 
+From: Client
+To: Server
+Description: Player leaves the game by exiting the window or clicking
+			 leave game button on GUI  
+Frame type: LEAVEGAME
+Data type: CHARACTER
+Message length: 1
+Message: '1'/'2'..
+Special Requirements: ASCII character representing which player left
+					  the game. Value should be between '1' to '4' 
+/******************************************************************/
+
+
+/******************************************************************/
+Message 14 : Broadcasting game over message
+From: Server
+To: All Clients
+Description: When any player leaves a game, other players should be
+			 informed 
+Frame type: BROADCASTGAMEOVER
+Data type: CHARACTER
+Message length: 1
+Message: '1'
+Special Requirements: Buffer length should be 1. The buffer will
+					  denote the player who left the game. 
+/******************************************************************/
+
+
+/******************************************************************/
+Message 15 : Broadcasting the winner of the game
+From: Server
+To: All clients
+Description: When any team wins the game, all players must be
+			 informed.
+Frame type: BROADCASTWINNER
+Data type: CHARACTER
+Message length: 1
+Message: '0'/'1'
+Special Requirements: Buffer length should be 1. The character 
+					  represents the team enum casted to int then to
+					  character. 
+/******************************************************************/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
